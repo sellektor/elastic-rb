@@ -5,6 +5,7 @@ require "elastic/version"
 
 module Elastic extend self
   attr_reader :configuration
+  @configuration = Configuration.new
 
   def configure
     @configuration = Configuration.new
