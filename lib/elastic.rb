@@ -1,6 +1,7 @@
 require "elastic/client"
 require "elastic/client/error"
 require "elastic/configuration"
+require "elastic/scroll"
 require "elastic/version"
 
 module Elastic extend self
