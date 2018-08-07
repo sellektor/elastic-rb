@@ -1,6 +1,8 @@
 require "elastic/client"
 require "elastic/client/error"
 require "elastic/configuration"
+require "elastic/helpers"
+require "elastic/index"
 require "elastic/scroll"
 require "elastic/version"
 
