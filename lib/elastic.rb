@@ -1,3 +1,4 @@
+require "elastic/buffer"
 require "elastic/client"
 require "elastic/client/error"
 require "elastic/configuration"
