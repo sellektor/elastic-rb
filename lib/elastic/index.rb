@@ -105,7 +105,7 @@ module Elastic
         action = :update
       end
 
-      metadata[:data] = data if data.present?
+      metadata[:data] = data unless data.empty?
 
       { action.to_sym => metadata }
     end
