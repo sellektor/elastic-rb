@@ -52,7 +52,12 @@ module Elastic
     end
 
     def refresh
+      @dirty = false
       client.refresh_index(index: index_name)
+    end
+
+    def dirty?
+      !!@dirty
     end
 
     def count(query = {})
@@ -113,6 +118,7 @@ module Elastic
     def buffer
       @buffer ||=
         Buffer.new do |operations|
+          @dirty = true
           client.bulk(operations)
         end
     end

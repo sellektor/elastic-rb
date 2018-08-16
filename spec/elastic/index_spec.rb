@@ -25,6 +25,10 @@ RSpec.describe Elastic::Index do
     expect(subject.index_name).to eq("#{namespace}-implementation-index")
   end
 
+  it "is not dirty by default" do
+    expect(subject.dirty?).to eq(false)
+  end
+
   it "generates index name if not passed as argument" do
     index = implementation.new
     expect(index.index_name).to match(/^#{Elastic.namespace}-implementation-\d+/)
@@ -91,6 +95,27 @@ RSpec.describe Elastic::Index do
     end
   end
 
+  describe "#refresh" do
+    it "refreshes index" do
+      s = spy
+
+      allow(subject).to receive(:client) { s }
+      expect(s).to receive(:refresh_index).with(index: subject.index_name)
+
+      subject.refresh
+    end
+
+    it "marks index as not dirty" do
+      # First, ensure it is marked as dirty
+      subject.bulk(:index, '1', { 'foo' => 'bar' })
+      subject.buffer.flush!
+
+      expect {
+        subject.refresh
+      }.to change { subject.dirty? }.from(true).to(false)
+    end
+  end
+
   describe "#buffer" do
     it "executes operations in bulk" do
       s = spy
@@ -102,6 +127,13 @@ RSpec.describe Elastic::Index do
       subject.bulk(:index, '2', { 'abc' => 'xyz' })
 
       subject.buffer.flush!
+    end
+
+    it "marks index as dirty after executing operations" do
+      expect {
+        subject.bulk(:index, '1', { 'foo' => 'bar' })
+        subject.buffer.flush!
+      }.to change { subject.dirty? }.from(false).to(true)
     end
   end
 
