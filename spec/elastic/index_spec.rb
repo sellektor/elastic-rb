@@ -90,4 +90,57 @@ RSpec.describe Elastic::Index do
       end
     end
   end
+
+  describe "#bulk_operation" do
+    it "builds delete operation" do
+      operation = subject.bulk_operation(:delete, 'id')
+
+      expect(operation).to \
+        eq(delete: {
+          _index: subject.index_name,
+          _type:  subject.class.document_type,
+          _id:    'id',
+          _retry_on_conflict: 3
+        })
+    end
+
+    it "builds index operation" do
+      operation = subject.bulk_operation(:index, 'id', { 'foo' => 'bar' })
+
+      expect(operation).to \
+        eq(index: {
+          _index: subject.index_name,
+          _type:  subject.class.document_type,
+          _id:    'id',
+          _retry_on_conflict: 3,
+          data:   { 'foo' => 'bar' }
+        })
+    end
+
+    it "builds update operation" do
+      operation = subject.bulk_operation(:update, 'id', doc: { 'foo' => 'bar' })
+
+      expect(operation).to \
+        eq(update: {
+          _index: subject.index_name,
+          _type:  subject.class.document_type,
+          _id:    'id',
+          _retry_on_conflict: 3,
+          data:   { doc: { 'foo' => 'bar' } }
+        })
+    end
+
+    it "builds upsert operation" do
+      operation = subject.bulk_operation(:upsert, 'id', doc: { 'foo' => 'bar' })
+
+      expect(operation).to \
+        eq(update: {
+          _index: subject.index_name,
+          _type:  subject.class.document_type,
+          _id:    'id',
+          _retry_on_conflict: 3,
+          data:   { doc_as_upsert: true, doc: { 'foo' => 'bar' } }
+        })
+    end
+  end
 end
