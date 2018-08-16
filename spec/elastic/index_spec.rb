@@ -91,6 +91,20 @@ RSpec.describe Elastic::Index do
     end
   end
 
+  describe "#buffer" do
+    it "executes operations in bulk" do
+      s = spy
+
+      allow(subject).to receive(:client) { s }
+      expect(s).to receive(:bulk).once
+
+      subject.bulk(:index, '1', { 'foo' => 'bar' })
+      subject.bulk(:index, '2', { 'abc' => 'xyz' })
+
+      subject.buffer.flush!
+    end
+  end
+
   describe "#bulk_operation" do
     it "builds delete operation" do
       operation = subject.bulk_operation(:delete, 'id')
