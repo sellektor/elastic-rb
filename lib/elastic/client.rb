@@ -2,6 +2,8 @@ require "elasticsearch"
 
 module Elastic
   class Client
+    attr_reader :client
+
     def initialize(connection_options = {})
       @client = Elasticsearch::Client.new(connection_options)
     end
@@ -131,10 +133,6 @@ module Elastic
       rescue => ex
         raise ex.extend(Error)
       end
-    end
-
-    def client
-      @client
     end
   end
 end
