@@ -21,6 +21,28 @@ RSpec.describe Elastic::Index do
 
   subject { implementation.new("#{namespace}-implementation-index") }
 
+  describe ".resolve" do
+    before do
+      subject.create
+    end
+
+    context "when index is aliased" do
+      before do
+        subject.promote
+      end
+
+      it "returns aliased index" do
+        expect(implementation.resolve).to eq(subject)
+      end
+    end
+
+    context "when index is not aliased" do
+      it "returns nil instead of aliased index" do
+        expect(implementation.resolve).to be(nil)
+      end
+    end
+  end
+
   it "initializes with index name" do
     expect(subject.index_name).to eq("#{namespace}-implementation-index")
   end

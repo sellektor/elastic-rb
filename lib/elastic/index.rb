@@ -11,8 +11,9 @@ module Elastic
       end
 
       def resolve
-        index_name = client.resolve_alias(name: alias_name).first
-        new(index_name)
+        if index_name = client.resolve_alias(name: alias_name).first
+          new(index_name)
+        end
       end
 
       def generate_index_name
@@ -125,6 +126,10 @@ module Elastic
 
     def alias_name
       self.class.alias_name
+    end
+
+    def ==(other)
+      self.class == other.class && index_name == other.index_name
     end
 
     private
