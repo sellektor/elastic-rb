@@ -103,22 +103,22 @@ RSpec.describe Elastic::Client do
     client.create_index(index: index_name)
 
     index_operations = [
-      client.bulk_operation(:index, index_name, 'product', 1, { name: 'Product 1' }),
-      client.bulk_operation(:index, index_name, 'product', 2, { name: 'Product 2' }),
+      client.bulk_operation(:index, index_name, 1, { name: 'Product 1' }),
+      client.bulk_operation(:index, index_name, 2, { name: 'Product 2' }),
     ]
 
     client.bulk(index_operations)
 
-    docs = client.mget(index_name, [1, 2], 'product')
+    docs = client.mget(index_name, [1, 2])
     expect(docs.size).to eq(2)
 
     delete_operations = [
-      client.bulk_operation(:delete, index_name, 'product', 1),
+      client.bulk_operation(:delete, index_name, 1),
     ]
 
     client.bulk(delete_operations)
 
-    docs = client.mget(index_name, [1, 2], 'product')
+    docs = client.mget(index_name, [1, 2])
     expect(docs.size).to eq(1)
   end
 

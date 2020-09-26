@@ -11,7 +11,7 @@ RSpec.describe Elastic::Scroll do
   end
 
   before(:each) {
-    bulk_index(index_name, 'person', docs)
+    bulk_index(index_name, docs)
   }
 
   it "enumerates the scrolled docs" do
@@ -36,7 +36,7 @@ RSpec.describe Elastic::Scroll do
 
   it "scrolls through the index with query" do
     body = {
-      query: { ids: { type: 'person', values: [1, 2, 3] } },
+      query: { ids: { values: [1, 2, 3] } },
       sort: { age: "asc" }
     }
 

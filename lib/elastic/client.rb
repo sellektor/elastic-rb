@@ -77,10 +77,9 @@ module Elastic
       execute { bulk(options) }
     end
 
-    def bulk_operation(action, index, type, id, data = {})
+    def bulk_operation(action, index, id, data = {})
       metadata = {
         _index: index,
-        _type:  type,
         _id:    id,
       }
 
@@ -89,15 +88,14 @@ module Elastic
       { action.to_sym => metadata }
     end
 
-    def mget(index, ids, type)
+    def mget(index, ids)
       ids = Array(ids)
       return [] if ids.empty?
 
-      docs = ids.map { |id| { _index: index, _type: type, _id: id } }
+      docs = ids.map { |id| { _index: index, _id: id } }
 
       options = {
         index: index,
-        type: type,
         body: {
           docs: docs
         }

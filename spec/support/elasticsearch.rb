@@ -21,10 +21,10 @@ module RSpecSupport
       end
     end
 
-    def bulk_index(index_name, type, docs)
+    def bulk_index(index_name, docs)
       data =
         docs.map do |doc|
-          elasticsearch_client.bulk_operation(:index, index_name, type, doc['_id'], doc['_source'])
+          elasticsearch_client.bulk_operation(:index, index_name, doc['_id'], doc['_source'])
         end
 
       elasticsearch_client.bulk(data, refresh: true)

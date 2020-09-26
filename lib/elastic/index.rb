@@ -1,11 +1,10 @@
 module Elastic
   class Index
     class << self
-      attr_accessor :client, :alias_name, :document_type, :settings, :mappings
+      attr_accessor :client, :alias_name, :settings, :mappings
 
       def inherited(klass)
         klass.alias_name    = Elastic::Helpers.to_alias_name(klass)
-        klass.document_type = 'document'
         klass.settings      = {}
         klass.mappings      = {}
       end
@@ -71,7 +70,7 @@ module Elastic
     end
 
     def mget(ids)
-      docs = client.mget(index_name, ids, self.class.document_type)
+      docs = client.mget(index_name, ids)
       docs.map { |doc| source_with_id(doc) }
     end
 
@@ -99,7 +98,6 @@ module Elastic
     def bulk_operation(action, id, data = {})
       metadata = {
         _index: index_name,
-        _type:  self.class.document_type,
         _id:    id,
         _retry_on_conflict: 3
       }

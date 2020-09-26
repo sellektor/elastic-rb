@@ -6,14 +6,11 @@ RSpec.describe Elastic::Index do
     Class.new(described_class) do
       self.client = Elastic.client(:test)
       self.alias_name = "#{Elastic.namespace}-implementation"
-      self.document_type = "person"
       self.settings = {}
       self.mappings = {
-        person: {
-          properties: {
-            name: { type: 'text' },
-            age:  { type: 'integer' }
-          }
+        properties: {
+          name: { type: 'text' },
+          age:  { type: 'integer' }
         }
       }
     end
@@ -166,7 +163,6 @@ RSpec.describe Elastic::Index do
       expect(operation).to \
         eq(delete: {
           _index: subject.index_name,
-          _type:  subject.class.document_type,
           _id:    'id',
           _retry_on_conflict: 3
         })
@@ -178,7 +174,6 @@ RSpec.describe Elastic::Index do
       expect(operation).to \
         eq(index: {
           _index: subject.index_name,
-          _type:  subject.class.document_type,
           _id:    'id',
           _retry_on_conflict: 3,
           data:   { 'foo' => 'bar' }
@@ -191,7 +186,6 @@ RSpec.describe Elastic::Index do
       expect(operation).to \
         eq(update: {
           _index: subject.index_name,
-          _type:  subject.class.document_type,
           _id:    'id',
           _retry_on_conflict: 3,
           data:   { doc: { 'foo' => 'bar' } }
@@ -204,7 +198,6 @@ RSpec.describe Elastic::Index do
       expect(operation).to \
         eq(update: {
           _index: subject.index_name,
-          _type:  subject.class.document_type,
           _id:    'id',
           _retry_on_conflict: 3,
           data:   { doc_as_upsert: true, doc: { 'foo' => 'bar' } }
