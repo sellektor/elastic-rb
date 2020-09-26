@@ -1,4 +1,4 @@
-describe Elastic::Buffer do
+RSpec.describe Elastic::Buffer do
   it 'buffers elements' do
     s = spy
 
