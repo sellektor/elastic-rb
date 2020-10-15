@@ -99,7 +99,7 @@ module Elastic
       metadata = {
         _index: index_name,
         _id:    id,
-        _retry_on_conflict: 3
+        retry_on_conflict: 3
       }
 
       if action.to_sym == :upsert

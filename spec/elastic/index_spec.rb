@@ -164,7 +164,7 @@ RSpec.describe Elastic::Index do
         eq(delete: {
           _index: subject.index_name,
           _id:    'id',
-          _retry_on_conflict: 3
+          retry_on_conflict: 3
         })
     end
 
@@ -175,7 +175,7 @@ RSpec.describe Elastic::Index do
         eq(index: {
           _index: subject.index_name,
           _id:    'id',
-          _retry_on_conflict: 3,
+          retry_on_conflict: 3,
           data:   { 'foo' => 'bar' }
         })
     end
@@ -187,7 +187,7 @@ RSpec.describe Elastic::Index do
         eq(update: {
           _index: subject.index_name,
           _id:    'id',
-          _retry_on_conflict: 3,
+          retry_on_conflict: 3,
           data:   { doc: { 'foo' => 'bar' } }
         })
     end
@@ -199,7 +199,7 @@ RSpec.describe Elastic::Index do
         eq(update: {
           _index: subject.index_name,
           _id:    'id',
-          _retry_on_conflict: 3,
+          retry_on_conflict: 3,
           data:   { doc_as_upsert: true, doc: { 'foo' => 'bar' } }
         })
     end
