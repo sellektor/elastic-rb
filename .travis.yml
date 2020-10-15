@@ -1,5 +1,13 @@
 sudo: false
+services:
+  - elasticsearch
 language: ruby
 rvm:
-  - 2.5.1
-before_install: gem install bundler -v 1.16.1
+  - 2.5
+  - 2.6
+  - 2.7
+before_install:
+  - curl https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.9.2-amd64.deb -o elasticsearch.deb
+  - sudo dpkg -i --force-confnew elasticsearch.deb
+  - sudo chown -R elasticsearch:elasticsearch /etc/default/elasticsearch
+  - sudo service elasticsearch restart
