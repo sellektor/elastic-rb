@@ -90,9 +90,6 @@ module Elastic
 
     def get(index, id)
       execute { get(id: id, index: index) }
-
-    rescue => ex
-      ex.status == 404 ? nil : raise
     end
 
     def mget(index, ids)
