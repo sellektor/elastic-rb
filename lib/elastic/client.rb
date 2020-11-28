@@ -88,6 +88,10 @@ module Elastic
       { action.to_sym => metadata }
     end
 
+    def get(index, id)
+      execute { get(id: id, index: index) }
+    end
+
     def mget(index, ids)
       ids = Array(ids)
       return [] if ids.empty?
