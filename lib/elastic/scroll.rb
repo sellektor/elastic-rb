@@ -2,13 +2,20 @@ module Elastic
   class Scroll
     include Enumerable
 
-    def initialize(client, index_name, size: 1_000, scroll: '5m', body: {}, stored_fields: [])
+    def initialize(client, index_name, options = {})
+      options = {
+        size: 1_000,
+        scroll: '5m',
+        body: {},
+        stored_fields: []
+      }.merge(options)
+
       @client        = client
       @index_name    = index_name
-      @size          = size
-      @scroll        = scroll
-      @body          = body
-      @stored_fields = stored_fields
+      @size          = options[:size]
+      @scroll        = options[:scroll]
+      @body          = options[:body]
+      @stored_fields = options[:stored_fields]
     end
 
     def each
