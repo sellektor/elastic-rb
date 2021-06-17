@@ -77,13 +77,14 @@ module Elastic
       execute { bulk(options) }
     end
 
-    def bulk_operation(action, index, id, data = {})
+    def bulk_operation(action, index, id, data = {}, query_params = {})
       metadata = {
         _index: index,
         _id:    id,
       }
 
       metadata[:data] = data if data && !data.empty?
+      metadata.merge!(query_params) unless query_params.empty?
 
       { action.to_sym => metadata }
     end
@@ -92,7 +93,7 @@ module Elastic
       execute { get(id: id, index: index) }
     end
 
-    def mget(index, ids)
+    def mget(index, ids, query_params = {})
       ids = Array(ids)
       return [] if ids.empty?
 
@@ -104,6 +105,8 @@ module Elastic
           docs: docs
         }
       }
+
+      options.merge!(query_params) unless query_params.empty?
 
       results = execute { mget(options) }
       results['docs'].select { |doc| doc['found'] }

@@ -126,7 +126,7 @@ RSpec.describe Elastic::Index do
 
     it "marks index as not dirty" do
       # First, ensure it is marked as dirty
-      subject.bulk(:index, '1', { 'foo' => 'bar' })
+      subject.bulk(:index, '1', data: { 'foo' => 'bar' })
       subject.buffer.flush!
 
       expect {
@@ -142,15 +142,15 @@ RSpec.describe Elastic::Index do
       allow(subject).to receive(:client) { s }
       expect(s).to receive(:bulk).once
 
-      subject.bulk(:index, '1', { 'foo' => 'bar' })
-      subject.bulk(:index, '2', { 'abc' => 'xyz' })
+      subject.bulk(:index, '1', data: { 'foo' => 'bar' })
+      subject.bulk(:index, '2', data: { 'abc' => 'xyz' })
 
       subject.buffer.flush!
     end
 
     it "marks index as dirty after executing operations" do
       expect {
-        subject.bulk(:index, '1', { 'foo' => 'bar' })
+        subject.bulk(:index, '1', data: { 'foo' => 'bar' })
         subject.buffer.flush!
       }.to change { subject.dirty? }.from(false).to(true)
     end
@@ -169,38 +169,41 @@ RSpec.describe Elastic::Index do
     end
 
     it "builds index operation" do
-      operation = subject.bulk_operation(:index, 'id', { 'foo' => 'bar' })
+      operation = subject.bulk_operation(:index, 'id', { 'foo' => 'bar' }, { routing: 'foo' })
 
       expect(operation).to \
         eq(index: {
           _index: subject.index_name,
           _id:    'id',
           retry_on_conflict: 3,
-          data:   { 'foo' => 'bar' }
+          data:   { 'foo' => 'bar' },
+          routing: 'foo'
         })
     end
 
     it "builds update operation" do
-      operation = subject.bulk_operation(:update, 'id', doc: { 'foo' => 'bar' })
+      operation = subject.bulk_operation(:update, 'id', { doc: { 'foo' => 'bar' } }, { routing: 'foo'})
 
       expect(operation).to \
         eq(update: {
           _index: subject.index_name,
           _id:    'id',
           retry_on_conflict: 3,
-          data:   { doc: { 'foo' => 'bar' } }
+          data:   { doc: { 'foo' => 'bar' } },
+          routing: 'foo'
         })
     end
 
     it "builds upsert operation" do
-      operation = subject.bulk_operation(:upsert, 'id', doc: { 'foo' => 'bar' })
+      operation = subject.bulk_operation(:upsert, 'id', { doc: { 'foo' => 'bar' } }, { routing: 'foo' })
 
       expect(operation).to \
         eq(update: {
           _index: subject.index_name,
           _id:    'id',
           retry_on_conflict: 3,
-          data:   { doc_as_upsert: true, doc: { 'foo' => 'bar' } }
+          data:   { doc_as_upsert: true, doc: { 'foo' => 'bar' } },
+          routing: 'foo'
         })
     end
   end
