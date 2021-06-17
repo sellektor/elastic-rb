@@ -65,12 +65,12 @@ module Elastic
       response['count']
     end
 
-    def get(id)
-      mget([id]).first
+    def get(id, query_params: {})
+      mget([id], query_params: query_params).first
     end
 
-    def mget(ids)
-      docs = client.mget(index_name, ids)
+    def mget(ids, query_params: {})
+      docs = client.mget(index_name, ids, query_params)
       docs.map { |doc| source_with_id(doc) }
     end
 
@@ -91,16 +91,18 @@ module Elastic
       docs.lazy.map { |doc| doc['_id'] }
     end
 
-    def bulk(action, id, data = {})
-      buffer << bulk_operation(action, id, data)
+    def bulk(action, id, data: {}, query_params: {})
+      buffer << bulk_operation(action, id, data, query_params)
     end
 
-    def bulk_operation(action, id, data = {})
+    def bulk_operation(action, id, data = {}, query_params = {})
       metadata = {
         _index: index_name,
         _id:    id,
-        retry_on_conflict: 3
+        retry_on_conflict: 3,
       }
+
+      metadata.merge!(query_params) unless query_params.empty?
 
       if action.to_sym == :upsert
         data ||= {}
