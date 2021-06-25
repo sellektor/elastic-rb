@@ -89,8 +89,9 @@ module Elastic
       { action.to_sym => metadata }
     end
 
-    def get(index, id)
-      execute { get(id: id, index: index) }
+    def get(index, id, query_params = {})
+      options = query_params.merge(id: id, index: index)
+      execute { get(options) }
     end
 
     def mget(index, ids, query_params = {})
