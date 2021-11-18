@@ -16,6 +16,14 @@ RSpec.describe Elastic::Index do
     end
   end
 
+  let(:docs) do
+    [{ "_id" => 1, "_source" => { "name" => "Joe", "age" => 20 } },
+     { "_id" => 2, "_source" => { "name" => "Ann", "age" => 10 } },
+     { "_id" => 3, "_source" => { "name" => "Tom", "age" => 30 } },
+     { "_id" => 4, "_source" => { "name" => "Joe", "age" => 40 } },
+     { "_id" => 5, "_source" => { "name" => "Joe", "age" => 50 } }]
+  end
+
   subject { implementation.new("#{namespace}-implementation-index") }
 
   describe ".resolve" do
@@ -205,6 +213,65 @@ RSpec.describe Elastic::Index do
           data:   { doc_as_upsert: true, doc: { 'foo' => 'bar' } },
           routing: 'foo'
         })
+    end
+  end
+
+  describe "with documents indexed" do
+    before(:each) do
+      subject.create
+      bulk_index(subject.index_name, docs)
+    end
+
+    describe "#count" do
+      it "counts all documents" do
+        count = subject.count()
+        expect(count).to eq(5)
+      end
+
+      it "counts documents matching query" do
+        count = subject.count(query: { match: { name: "Joe" } })
+        expect(count).to eq(3)
+      end
+    end
+
+    describe "#get" do
+      it "gets document by id" do
+        document = subject.get("1")
+        expect(document).to eq({"_id" => "1", "age" => 20, "name" => "Joe"})
+      end
+
+      it "returns nil for wrong id" do
+        document = subject.get("batman")
+        expect(document).to be(nil)
+      end
+    end
+
+    describe "#mget" do
+      it "gets multiple documents by ids" do
+        documents = subject.mget(["1", "2", "batman"])
+        expect(documents).to match_array([
+          { "_id" => "1", "age" => 20, "name" => "Joe" },
+          { "_id" => "2", "age" => 10, "name" => "Ann" }
+        ])
+      end
+    end
+
+    describe "#documents" do
+      it "searches documents matching query" do
+        documents = subject.documents(query: { match: { name: "Joe" } }).to_a
+        expect(documents).to match_array([
+          { "_id" => "1", "age" => 20, "name" => "Joe" },
+          { "_id" => "4", "age" => 40, "name" => "Joe" },
+          { "_id" => "5", "age" => 50, "name" => "Joe" },
+        ])
+      end
+    end
+
+    describe "#document_ids" do
+      it "searches ids of documents matching query" do
+        document_ids = subject.document_ids(query: { match: { name: "Joe" } }).to_a
+        expect(document_ids).to match_array(["1", "4", "5"])
+      end
     end
   end
 end
